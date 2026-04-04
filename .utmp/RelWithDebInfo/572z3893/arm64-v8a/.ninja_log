@@ -1,0 +1,12 @@
+# ninja log v5
+91	584	7781959048861310	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	b65616f2a94300d4
+604	1074	7781959053171219	C:/Users/flame/Desktop/BounceLOL/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/572z3893/obj/arm64-v8a/libswappywrapper.so	dbefcba89c7f7e6f
+46	2221	7781959064263648	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	8ecb935c3d754ced
+14	2233	7781959064659964	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	b39e918b24ac8149
+55	2236	7781959065112685	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	9f20b8d7858bb3c0
+77	2240	7781959065435292	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	5fb4ad503e0dde00
+26	2244	7781959065705460	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	643985a06186a515
+65	2388	7781959067180912	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	1e93489aa4de93de
+35	2609	7781959069343647	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	d8c989e984455683
+1	2788	7781959071136778	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	c9c0d6dd48e7fb8f
+2789	2949	7781959072790796	C:/Users/flame/Desktop/BounceLOL/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/572z3893/obj/arm64-v8a/libgame.so	7e036b1a62590fec

@@ -9,13 +9,25 @@ public class GameSkin : MonoBehaviour
     public int spriteno;
     public ParticleSystem trail;
 
-    // Update is called once per frame
+    void Awake()
+    {
+        if (image == null)
+        {
+            image = GetComponent<SpriteRenderer>();
+        }
+    }
+
     void Update()
     {
-        this.GetComponent<SpriteRenderer>().sprite = Sprite[PlayerPrefs.GetInt("selectedOption")];
-        if (PlayerPrefs.GetInt("trail") == 1)
+        int selected = Mathf.Clamp(PlayerPrefs.GetInt("selectedOption", 0), 0, Sprite.Length - 1);
+        if (image != null && Sprite != null && Sprite.Length > 0)
         {
-            trail.gameObject.active = true;
+            image.sprite = Sprite[selected];
+        }
+
+        if (trail != null)
+        {
+            trail.gameObject.SetActive(PlayerPrefs.GetInt("Trail", 0) > 0);
         }
     }
 }

@@ -1,36 +1,38 @@
 using UnityEngine;
-using UnityEngine.Advertisements;
-using UnityEngine.SceneManagement;
+using GoogleMobileAds;
+using GoogleMobileAds.Api;
 
-public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
+public class AdsInitializer : MonoBehaviour
 {
-    [SerializeField] string _androidGameId;
-    [SerializeField] string _iOSGameId;
-    [SerializeField] bool _testMode = true;
-    private string _gameId;
+    public static bool IsInitialized { get; private set; }
+    private static bool initRequested;
 
     void Awake()
     {
+        DontDestroyOnLoad(gameObject);
         InitializeAds();
     }
 
     public void InitializeAds()
     {
-        _gameId = (Application.platform == RuntimePlatform.IPhonePlayer)
-            ? _iOSGameId
-            : _androidGameId;
-        Advertisement.Initialize(_gameId, _testMode, this);
-    }
+        if (IsInitialized || initRequested)
+        {
+            return;
+        }
 
-    public void OnInitializationComplete()
-    {
-        Debug.Log("Unity Ads initialization complete.");
-    }
+        initRequested = true;
 
-    public void OnInitializationFailed(UnityAdsInitializationError error, string message)
-    {
-        Debug.Log($"Unity Ads Initialization Failed: {error.ToString()} - {message}");
-    }
+        MobileAds.Initialize((InitializationStatus initstatus) =>
+        {
+            if (initstatus == null)
+            {
+                Debug.LogError("Google Mobile Ads initialization failed.");
+                initRequested = false;
+                return;
+            }
 
-    
+            IsInitialized = true;
+            Debug.Log("Google Mobile Ads initialization complete.");
+        });
+    }
 }

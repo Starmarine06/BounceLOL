@@ -26,7 +26,7 @@ public class LineRendererScript : MonoBehaviour
         line.useWorldSpace = true;
         points = new List<Vector3>() { transform.position }; //indices 1 - end are solidified points, index 0 is always transform.position
         line.SetPositions(points.ToArray());
-        line.material = material[PlayerPrefs.GetInt("Trail")];
+        ApplySelectedTrailMaterial();
     }
 
     void AddPoint(Vector3 position)
@@ -46,7 +46,7 @@ public class LineRendererScript : MonoBehaviour
     {
         if(Selection == false)
         {
-            line.material = material[PlayerPrefs.GetInt("Trail")];
+            ApplySelectedTrailMaterial();
         }
         //cull based on lifetime
         while (spawnTimes.Count > 0 && spawnTimes.Peek() + lifetime < Time.time)
@@ -74,5 +74,12 @@ public class LineRendererScript : MonoBehaviour
         //save result
         line.positionCount = points.Count;
         line.SetPositions(points.ToArray());
+    }
+
+    private void ApplySelectedTrailMaterial()
+    {
+        if (material == null || material.Length == 0 || line == null) return;
+        int selected = Mathf.Clamp(PlayerPrefs.GetInt("Trail", 0), 0, material.Length - 1);
+        line.material = material[selected];
     }
 }

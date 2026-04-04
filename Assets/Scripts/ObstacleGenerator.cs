@@ -8,6 +8,7 @@ public class ObstacleGenerator : MonoBehaviour
 
     public int PoolSize;
     public float Speed;
+    public float SpeedIncrement;
     public static float SpeedChange;
     public float Smooth;
     public Vector2 WidthRange;
@@ -50,7 +51,21 @@ public class ObstacleGenerator : MonoBehaviour
     {
         startPos = new Vector3(15f, 0f, 0f);
         FillPool();
-        Speed = 10;
+        InitializeLevelSettings();
+    }
+
+    private void InitializeLevelSettings()
+    {
+        LevelManager.LevelConfig levelConfig = LevelManager.GetCurrentLevelConfig();
+        
+        // Only speed increment and smooth change per level
+        SpeedIncrement = levelConfig.speedIncrement;
+        Smooth = Mathf.Max(levelConfig.smooth, 2.0f); // Ensure minimum 2
+        
+        // Keep default values for other parameters
+        Speed = 9f;
+        Delta = 0.5f;
+        D = 1;
     }
 
     void Start()
@@ -126,7 +141,7 @@ public class ObstacleGenerator : MonoBehaviour
 
     public void FixedUpdate()
     {
-        Speed += .005f;
+        Speed += SpeedIncrement;
     }
 
     private IEnumerator generator()
