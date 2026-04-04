@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -53,7 +53,20 @@ public class ColorEffect : MonoBehaviour
 
     void Awake()
     {
-        colorIndex = PlayerPrefs.GetInt(MainController.Prefs_ColorIndex_Key, MainController.Prefs_ColorIndex_DefaultValue);
+        int themePalette = PlayerPrefs.GetInt(ThemeShopManager.ThemePaletteIndexKey, -1);
+        if (themePalette >= 0 && themePalette < ThemeColors.Length)
+        {
+            colorIndex = themePalette;
+        }
+        else
+        {
+            colorIndex = PlayerPrefs.GetInt(MainController.Prefs_ColorIndex_Key, MainController.Prefs_ColorIndex_DefaultValue);
+            if (colorIndex < 0 || colorIndex >= ThemeColors.Length)
+            {
+                colorIndex = 0;
+            }
+        }
+
         Camera.main.backgroundColor = ThemeColors[colorIndex][1];
         ObstacleColor.BaseColor = ThemeColors[colorIndex][0];
         ParticleColor.BaseColor = ThemeColors[colorIndex][0];

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="BounceLOL">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/encrypted_private_key_path.zip!/" />
+      <root url="jar://$PROJECT_DIR$/pepk.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
