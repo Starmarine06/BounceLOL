@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,7 +8,7 @@ public class MainMenuController : MonoBehaviour
 {
     public GameObject QuitPopupUI;
     public Text BestScoreText;
-    public InterstitialAd adsManager;
+    public InterstitialAds adsManager;
 
     void Awake()
     {
@@ -26,12 +26,21 @@ public class MainMenuController : MonoBehaviour
 
     public void Play()
     {
-        float chance = Random.Range(1, 6);
-        Debug.Log(chance);
-        if (chance == 1)
+        GameMode.SetVsBot(false);
+        LoadGameScene();
+    }
+
+    public void PlayVsBot()
+    {
+        GameMode.SetVsBot(true);
+        LoadGameScene();
+    }
+
+    private void LoadGameScene()
+    {
+        if (adsManager != null)
         {
-            adsManager.LoadAd();
-            adsManager.ShowAd();
+            adsManager.ShowAdOrLoadScene();
         }
         else
         {

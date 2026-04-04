@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="android-bridge">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/IronSource.plugin/build/intermediates/merged_jni_libs/release/out/android-bridge.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

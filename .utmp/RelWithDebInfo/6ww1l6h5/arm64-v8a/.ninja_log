@@ -1,0 +1,23 @@
+# ninja log v5
+169	2825	7970035850460126	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	a93213fac1621ec3
+318	1188	7970035833599680	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	cdbc2c00cf7ef32f
+1189	1622	7970035837550767	C:/Users/flame/Desktop/BounceLOL/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/6ww1l6h5/obj/arm64-v8a/libswappywrapper.so	d89a87ebd24f82e8
+290	2350	7970035845172968	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	30203ff0274efe31
+14	2332	7970035844114951	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	b3126ccc2d7b8dbf
+228	2253	7970035844675528	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	9bca75a73c6f4ccf
+301	2459	7970035846834394	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	b78cbb9d3bcfec47
+247	2340	7970035844196496	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	83d6047ffb55c0b1
+195	2373	7970035846027381	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	c48f8d8dd4b1d651
+277	2645	7970035848659616	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	ab46eb801a14bcb0
+2825	2968	7970035852000902	C:/Users/flame/Desktop/BounceLOL/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/6ww1l6h5/obj/arm64-v8a/libgame.so	53c99b62146b3e4e
+134	539	7970042686200203	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	cdbc2c00cf7ef32f
+540	878	7970042690294790	C:/Users/flame/Desktop/BounceLOL/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/6ww1l6h5/obj/arm64-v8a/libswappywrapper.so	d89a87ebd24f82e8
+29	1808	7970042699851559	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	b3126ccc2d7b8dbf
+79	1899	7970042700111319	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	30203ff0274efe31
+53	1902	7970042700505786	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	9bca75a73c6f4ccf
+105	1914	7970042700526249	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	83d6047ffb55c0b1
+17	1942	7970042700855848	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	c48f8d8dd4b1d651
+121	2047	7970042702210457	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	b78cbb9d3bcfec47
+90	2197	7970042703685195	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	ab46eb801a14bcb0
+67	2355	7970042705346612	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	a93213fac1621ec3
+2355	2528	7970042707100761	C:/Users/flame/Desktop/BounceLOL/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/6ww1l6h5/obj/arm64-v8a/libgame.so	53c99b62146b3e4e

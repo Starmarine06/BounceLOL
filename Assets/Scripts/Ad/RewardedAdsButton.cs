@@ -1,137 +1,148 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Advertisements;
-
-public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
+using GoogleMobileAds.Api;
+public class RewardedAdsButton : MonoBehaviour
 {
-    [SerializeField] Button _showAdButton;
-    [SerializeField] string _androidAdUnitId = "Rewarded_Android";
-    [SerializeField] string _iOSAdUnitId = "Rewarded_iOS";
-    string _adUnitId = null; // This will remain null for unsupported platforms
+    [SerializeField] private string _adUnitId;
+    [SerializeField] private int rewardCoinsPerView = 500;
     public CoinsManager coinsManager;
-    public int Val;
+    private RewardedAd rewardedAd;
+    private bool isLoading;
 
-    void Awake()
+    private void Start()
     {
-        // Get the Ad Unit ID for the current platform:
-#if UNITY_IOS
-        _adUnitId = _iOSAdUnitId;
-#elif UNITY_ANDROID
-        _adUnitId = _androidAdUnitId;
-#endif
-
-        
+        LoadAd();
     }
 
-    // Load content to the Ad Unit:
     public void LoadAd()
     {
-        // IMPORTANT! Only load content AFTER initialization (in this example, initialization is handled in a different script).
-        Debug.Log("Loading Ad: " + _adUnitId);
-        Advertisement.Load(_adUnitId, this);
-        ShowAd();
-    }
-
-    // If the ad successfully loads, add a listener to the button and enable it:
-    public void OnUnityAdsAdLoaded(string adUnitId)
-    {
-        Debug.Log("Ad Loaded: " + adUnitId);
-
-        if (adUnitId.Equals(_adUnitId))
+        if (string.IsNullOrWhiteSpace(_adUnitId))
         {
-            // Configure the button to call the ShowAd() method when clicked:
-            //_showAdButton.onClick.AddListener(ShowAd);
-            // Enable the button for users to click:
-            //_showAdButton.interactable = true;
+            Debug.LogError("RewardedAdsButton: Ad Unit Id is empty.");
+            return;
         }
-    }
 
-    // Implement a method to execute when the user clicks the button:
-    public void ShowAd()
-    {
-        // Disable the button:
-        //_showAdButton.interactable = false;
-        // Then show the ad:
-        Advertisement.Show(_adUnitId, this);
-    }
+        if (isLoading) return;
+        isLoading = true;
 
-    // Implement the Show Listener's OnUnityAdsShowComplete callback method to determine if the user gets a reward:
-    public void OnUnityAdsShowComplete(string adUnitId, UnityAdsShowCompletionState showCompletionState)
-    {
-        if (adUnitId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsShowCompletionState.COMPLETED))
+        if (rewardedAd != null)
         {
-            coinsManager.coinText.text = PlayerPrefs.GetInt("Coins").ToString();
-
-            Debug.Log("Unity Ads Rewarded Ad Completed");
-            // Grant a reward.
-            if(PlayerPrefs.GetInt("AdsNo") == 1)
-            {
-                Val = PlayerPrefs.GetInt("Coins") + 500;
-                PlayerPrefs.SetInt("Coins", Val);
-                Val = PlayerPrefs.GetInt("AdsNo") - 1;
-                PlayerPrefs.SetInt("AdsNo", Val);
-                Val = 0;
-                LoadAd();
-            }
-            else if (PlayerPrefs.GetInt("AdsNo") == 2)
-            {
-                Val = PlayerPrefs.GetInt("Coins") + 500;
-                PlayerPrefs.SetInt("Coins", Val);
-                Val = PlayerPrefs.GetInt("AdsNo") - 1;
-                PlayerPrefs.SetInt("AdsNo", Val);
-                Val = 0;
-                LoadAd();
-            }
-            else if (PlayerPrefs.GetInt("AdsNo") == 3)
-            {
-                Val = PlayerPrefs.GetInt("Coins") + 500;
-                PlayerPrefs.SetInt("Coins", Val);
-                Val = PlayerPrefs.GetInt("AdsNo") - 1;
-                PlayerPrefs.SetInt("AdsNo", Val);
-                Val = 0;
-                LoadAd();
-            }
-            else if (PlayerPrefs.GetInt("AdsNo") == 4)
-            {
-                Val = PlayerPrefs.GetInt("Coins") + 500;
-                PlayerPrefs.SetInt("Coins", Val);
-                Val = PlayerPrefs.GetInt("AdsNo") - 1;
-                PlayerPrefs.SetInt("AdsNo", Val);
-                Val = 0;
-                LoadAd();
-            }
-            else if (PlayerPrefs.GetInt("AdsNo") == 5)
-            {
-                Val = PlayerPrefs.GetInt("Coins") + 500;
-                PlayerPrefs.SetInt("Coins", Val);
-                Val = PlayerPrefs.GetInt("AdsNo") - 1;
-                PlayerPrefs.SetInt("AdsNo", Val);
-                Val = 0;
-                LoadAd();
-            }
-            // Load another ad:
+            rewardedAd.Destroy();
+            rewardedAd = null;
         }
+
+        var adRequest = new AdRequest();
+        RewardedAd.Load(_adUnitId, adRequest, (RewardedAd ad, LoadAdError error) =>
+            {
+                isLoading = false;
+                // If the operation failed with a reason.
+                if (error != null)
+                {
+                    Debug.LogError("Rewarded ad failed to load an ad with error : " + error);
+                    return;
+                }
+                // If the operation failed for unknown reasons.
+                // This is an unexpected error, please report this bug if it happens.
+                if (ad == null)
+                {
+                    Debug.LogError("Unexpected error: Rewarded load event fired with null ad and null error.");
+                    return;
+                }
+
+                // The operation completed successfully.
+                Debug.Log("Rewarded ad loaded with response : " + ad.GetResponseInfo());
+                rewardedAd = ad;
+
+                // Register to ad events to extend functionality.
+                RegisterEventHandlers(ad);
+            });
     }
 
-    // Implement Load and Show Listener error callbacks:
-    public void OnUnityAdsFailedToLoad(string adUnitId, UnityAdsLoadError error, string message)
+    public void ShowRewardedAd()
     {
-        Debug.Log($"Error loading Ad Unit {adUnitId}: {error.ToString()} - {message}");
-        // Use the error details to determine whether to try to load another ad.
+        if (rewardedAd != null && rewardedAd.CanShowAd())
+        {
+            rewardedAd.Show((Reward reward) =>
+            {
+                GrantReward();
+            });
+            return;
+        }
+
+        LoadAd();
+        Debug.Log("Rewarded ad is not ready yet.");
     }
 
-    public void OnUnityAdsShowFailure(string adUnitId, UnityAdsShowError error, string message)
+    // Backward-compatible method name for existing button bindings.
+    public void ShowAd(int amt)
     {
-        Debug.Log($"Error showing Ad Unit {adUnitId}: {error.ToString()} - {message}");
-        // Use the error details to determine whether to try to load another ad.
+        rewardCoinsPerView = amt;
+        ShowRewardedAd();
     }
 
-    public void OnUnityAdsShowStart(string adUnitId) { }
-    public void OnUnityAdsShowClick(string adUnitId) { }
+    private void GrantReward()
+    {
+        int currentCoins = PlayerPrefs.GetInt("Coins", 0);
+        PlayerPrefs.SetInt("Coins", currentCoins + rewardCoinsPerView);
+        PlayerPrefs.Save();
+        if (coinsManager != null)
+        {
+            coinsManager.coinText.text = "Money: $" + PlayerPrefs.GetInt("Coins", 0);
+        }
+        LoadAd();
+    }
+
+    // Backward-compatible method name kept for older event wiring.
+    public void OnUnityAdsShowComplete(string ignoredAdUnitId)
+    {
+        GrantReward();
+    }
 
     void OnDestroy()
     {
-        // Clean up the button listeners:
-        //_showAdButton.onClick.RemoveAllListeners();
+        if (rewardedAd != null)
+        {
+            Debug.Log("Destroying rewarded ad.");
+            rewardedAd.Destroy();
+            rewardedAd = null;
+        }
     }
+    
+    private void RegisterEventHandlers(RewardedAd ad)
+        {
+            // Raised when the ad is estimated to have earned money.
+            ad.OnAdPaid += (AdValue adValue) =>
+            {
+                Debug.Log("Rewarded ad paid " + adValue.Value + " " + adValue.CurrencyCode);
+            };
+            // Raised when an impression is recorded for an ad.
+            ad.OnAdImpressionRecorded += () =>
+            {
+                Debug.Log("Rewarded ad recorded an impression.");
+            };
+            // Raised when a click is recorded for an ad.
+            ad.OnAdClicked += () =>
+            {
+                Debug.Log("Rewarded ad was clicked.");
+            };
+            // Raised when the ad opened full screen content.
+            ad.OnAdFullScreenContentOpened += () =>
+            {
+                Debug.Log("Rewarded ad full screen content opened.");
+            };
+            // Raised when the ad closed full screen content.
+            ad.OnAdFullScreenContentClosed += () =>
+            {
+                Debug.Log("Rewarded ad full screen content closed.");
+                LoadAd();
+            };
+            // Raised when the ad failed to open full screen content.
+            ad.OnAdFullScreenContentFailed += (AdError error) =>
+            {
+                Debug.LogError("Rewarded ad failed to open full screen content with error : "
+                    + error);
+                LoadAd();
+            };
+        }
+
+
 }

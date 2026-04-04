@@ -19,6 +19,10 @@ public class CoinsManager : MonoBehaviour
     {
         coins = PlayerPrefs.GetInt("Coins");
         coinText.text = "Money: $" + PlayerPrefs.GetInt("Coins").ToString();
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            adCoins(100);
+        }
     }
 
     public void adCoins(int value)

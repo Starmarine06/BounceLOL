@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void LeaderboardUpdate(bool success)
+    void LeaderboardUpdate(bool success)
     {
         if (success) Debug.Log("Updates");
         else Debug.Log("Failed");

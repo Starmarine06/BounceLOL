@@ -1,87 +1,195 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+
+public enum ShopItemType
+{
+    Skin = 0,
+    Trail = 1
+}
+
+[System.Serializable]
+public class SkinShopItem
+{
+    public string displayName;
+    public int cost;
+    public Sprite previewSprite;
+}
+
+[System.Serializable]
+public class TrailShopItem
+{
+    public string displayName;
+    public int cost;
+    public Color previewColor = Color.white;
+}
 
 public class ShopManager : MonoBehaviour
 {
-    public int[,] shopItems = new int[5, 5];
-    public float coins;
-    public Text CoinsTxt;
-    public Text NotEnoughTxt;
-    public AudioSource audioSource;
-    string name;
+    [Header("Catalog")]
+    public SkinShopItem[] skins;
+    public TrailShopItem[] trails;
 
-    void Start()
+    [Header("UI")]
+    public Text coinsText;
+    public Text notEnoughText;
+    public float notEnoughDuration = 2f;
+
+    private const string CoinsKey = "Coins";
+    private const string SelectedSkinKey = "selectedOption";
+    private const string SelectedTrailKey = "Trail";
+
+    private void Awake()
     {
-        NotEnoughTxt.enabled = false;
-
-        coins = PlayerPrefs.GetInt("Coins");
-        CoinsTxt.text = "Coins:" + coins.ToString();
-
-        //ID's
-        shopItems[1, 1] = 1;
-        shopItems[1, 2] = 2;
-        shopItems[1, 3] = 3;
-        shopItems[1, 4] = 4;
-
-        //Price
-        shopItems[2, 1] = 1000;
-        shopItems[2, 2] = 2000;
-        shopItems[2, 3] = 3500;
-        shopItems[2, 4] = 5000;
-
-        //Quantity
-        shopItems[3, 1] = 0;
-        shopItems[3, 2] = 0;
-        shopItems[3, 3] = 0;
-        shopItems[3, 4] = 0;
+        if (notEnoughText != null)
+        {
+            notEnoughText.enabled = false;
+        }
     }
 
-    void Update()
+    private void Start()
     {
-        CoinsTxt.text = "Money: $" + coins.ToString();
-        if (PlayerPrefs.GetInt("Audio") == 1)
+        EnsureDefaultsOwned();
+        RefreshCoinsUi();
+    }
+
+    public int GetCoins()
+    {
+        return PlayerPrefs.GetInt(CoinsKey, 0);
+    }
+
+    public void AddCoins(int amount)
+    {
+        int next = Mathf.Max(0, GetCoins() + amount);
+        PlayerPrefs.SetInt(CoinsKey, next);
+        PlayerPrefs.Save();
+        RefreshCoinsUi();
+    }
+
+    public int GetCost(ShopItemType itemType, int itemIndex)
+    {
+        if (itemType == ShopItemType.Skin)
         {
-            audioSource.enabled = true;
+            if (skins == null || itemIndex < 0 || itemIndex >= skins.Length) return -1;
+            return skins[itemIndex].cost;
+        }
+
+        if (trails == null || itemIndex < 0 || itemIndex >= trails.Length) return -1;
+        return trails[itemIndex].cost;
+    }
+
+    public Sprite GetSkinPreview(int itemIndex)
+    {
+        if (skins == null || itemIndex < 0 || itemIndex >= skins.Length) return null;
+        return skins[itemIndex].previewSprite;
+    }
+
+    public Color GetTrailPreviewColor(int itemIndex)
+    {
+        if (trails == null || itemIndex < 0 || itemIndex >= trails.Length) return Color.white;
+        return trails[itemIndex].previewColor;
+    }
+
+    public bool IsOwned(ShopItemType itemType, int itemIndex)
+    {
+        if (itemIndex == 0) return true;
+        return PlayerPrefs.GetInt(GetOwnedKey(itemType, itemIndex), 0) == 1;
+    }
+
+    public bool IsEquipped(ShopItemType itemType, int itemIndex)
+    {
+        if (itemType == ShopItemType.Skin)
+        {
+            return PlayerPrefs.GetInt(SelectedSkinKey, 0) == itemIndex;
+        }
+
+        return PlayerPrefs.GetInt(SelectedTrailKey, 0) == itemIndex;
+    }
+
+    public bool Purchase(ShopItemType itemType, int itemIndex)
+    {
+        if (IsOwned(itemType, itemIndex))
+        {
+            Equip(itemType, itemIndex);
+            return true;
+        }
+
+        int cost = GetCost(itemType, itemIndex);
+        if (cost < 0) return false;
+
+        int coins = GetCoins();
+        if (coins < cost)
+        {
+            ShowNotEnough();
+            return false;
+        }
+
+        PlayerPrefs.SetInt(CoinsKey, coins - cost);
+        PlayerPrefs.SetInt(GetOwnedKey(itemType, itemIndex), 1);
+        Equip(itemType, itemIndex);
+        PlayerPrefs.Save();
+        RefreshCoinsUi();
+        return true;
+    }
+
+    public void Equip(ShopItemType itemType, int itemIndex)
+    {
+        if (!IsOwned(itemType, itemIndex)) return;
+
+        if (itemType == ShopItemType.Skin)
+        {
+            PlayerPrefs.SetInt(SelectedSkinKey, itemIndex);
         }
         else
         {
-            audioSource.enabled = false;
+            PlayerPrefs.SetInt(SelectedTrailKey, itemIndex);
+        }
+
+        PlayerPrefs.Save();
+        ShopEquipmentEvents.RaiseEquipmentChanged();
+    }
+
+    private void RefreshCoinsUi()
+    {
+        if (coinsText != null)
+        {
+            coinsText.text = "Money: $" + GetCoins();
         }
     }
 
-    public void Buy(Button button)
+    private void EnsureDefaultsOwned()
     {
-        GameObject ButtonRef = GameObject.FindGameObjectWithTag("Event").GetComponent<EventSystem>().currentSelectedGameObject;
+        PlayerPrefs.SetInt(GetOwnedKey(ShopItemType.Skin, 0), 1);
+        PlayerPrefs.SetInt(GetOwnedKey(ShopItemType.Trail, 0), 1);
+        PlayerPrefs.Save();
+        ShopEquipmentEvents.RaiseEquipmentChanged();
+    }
 
-        if (coins >= shopItems[2, ButtonRef.GetComponent<ButtonInfo>().ItemID])
+    private static string GetOwnedKey(ShopItemType itemType, int itemIndex)
+    {
+        return (itemType == ShopItemType.Skin ? "Spurchased" : "Tpurchased") + itemIndex;
+    }
+
+    private void ShowNotEnough()
+    {
+        if (notEnoughText == null) return;
+        notEnoughText.enabled = true;
+        StopAllCoroutines();
+        StartCoroutine(HideNotEnoughAfterDelay());
+    }
+
+    private IEnumerator HideNotEnoughAfterDelay()
+    {
+        yield return new WaitForSeconds(notEnoughDuration);
+        if (notEnoughText != null)
         {
-            name = "Button" + ButtonRef.GetComponent<ButtonInfo>().ItemID;
-            PlayerPrefs.SetInt(name, 1);
-            button.interactable = false;
-            Debug.Log(button.interactable);
-            coins -= shopItems[2, ButtonRef.GetComponent<ButtonInfo>().ItemID];
-            shopItems[3, ButtonRef.GetComponent<ButtonInfo>().ItemID]++;
-            CoinsTxt.text = "Money: $" + coins.ToString();
-            PlayerPrefs.SetInt("Coins", ((int)coins));
-            PlayerPrefs.SetInt(ButtonRef.GetComponent<ButtonInfo>().ItemID.ToString(), 1);
-        }
-        else
-        {
-            StartCoroutine(CoinsLess());
+            notEnoughText.enabled = false;
         }
     }
-    IEnumerator CoinsLess()
+
+    public void GoToMainMenu(int i)
     {
-        NotEnoughTxt.enabled = true;
-        yield return new WaitForSeconds(1);
-        NotEnoughTxt.enabled = false;
-    }
-    public void ChangeScene(int sceneID)
-    {
-        SceneManager.LoadScene(sceneID);
+        SceneManager.LoadScene(i);
     }
 }

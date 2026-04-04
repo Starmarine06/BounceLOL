@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -16,16 +16,21 @@ public class GameController : MonoBehaviour
     public GameObject PauseMenuUI;
     public GameObject GameOverUI;
     public Text PlayingScoreText;
+    [Tooltip("Optional. When vs-bot mode is on, shows bot score.")]
+    public Text BotPlayingScoreText;
     public Text GameOverScoreText;
     public Text GameOverBestScoreText;
+    [Tooltip("Optional. Shown on game over when vs-bot mode: You win / Bot wins / Tie.")]
+    public Text VsBotResultText;
 
     private int score;
+    private int botScore;
     public static int scoreChange;
     private int bestScore;
     private static float playingBackgroungMusicTime;
     private AudioSource playingBackgroungMusic;
 
-    public InterstitialAd adsManager;
+    public InterstitialAds adsManager;
 
     public CoinsManager coinsManager;
 
@@ -42,7 +47,7 @@ public class GameController : MonoBehaviour
             {
                 score = 0;
             }
-            PlayingScoreText.text = "Score: " + score;
+            RefreshPlayingScoreTexts();
         }
     }
 
@@ -74,6 +79,12 @@ public class GameController : MonoBehaviour
         PlayingUI.SetActive(true);
         GameOverUI.SetActive(false);
         PauseMenuUI.SetActive(false);
+        botScore = 0;
+        if (VsBotResultText != null)
+        {
+            VsBotResultText.text = string.Empty;
+        }
+        RefreshPlayingScoreTexts();
     }
     float _time;
     [SerializeField] float _interval = 2f;
@@ -92,7 +103,6 @@ public class GameController : MonoBehaviour
         {
             PauseMenuToggle();
         }
-        PlayingScoreText.text = "Score: " + score;
         if (score == 20)
         {
             scoreChange = score;
@@ -100,9 +110,31 @@ public class GameController : MonoBehaviour
     }
     private void addScore()
     {
-        
         score++;
-        //Debug.Log(score);
+        if (GameMode.IsVsBot)
+        {
+            botScore += 1 + Random.Range(0, 2);
+        }
+        RefreshPlayingScoreTexts();
+    }
+
+    private void RefreshPlayingScoreTexts()
+    {
+        if (PlayingScoreText == null) return;
+
+        if (GameMode.IsVsBot && BotPlayingScoreText != null)
+        {
+            PlayingScoreText.text = "You: " + score;
+            BotPlayingScoreText.text = "Bot: " + botScore;
+        }
+        else
+        {
+            PlayingScoreText.text = "Score: " + score;
+            if (BotPlayingScoreText != null)
+            {
+                BotPlayingScoreText.text = string.Empty;
+            }
+        }
     }
 
     public void GameOver()
@@ -116,13 +148,42 @@ public class GameController : MonoBehaviour
             BestScore = Score;
             PlayerPrefs.SetInt(MainController.Prefs_BestScore_Key, BestScore);
         }
+        
+        // Save level-specific score
+        int currentLevel = LevelManager.GetCurrentLevel();
+        string levelScoreKey = $"Level_{currentLevel}_BestScore";
+        int levelBestScore = PlayerPrefs.GetInt(levelScoreKey, 0);
+        if (score > levelBestScore)
+        {
+            PlayerPrefs.SetInt(levelScoreKey, score);
+        }
+        
         ColorEffect.ColorIndex++;
         PlayerPrefs.SetInt(MainController.Prefs_ColorIndex_Key, ColorEffect.ColorIndex);
         ColorEffect.ColorIndex--;
         PlayingUI.SetActive(false);
         GameOverScoreText.text = "SCORE\n" + score;
         GameOverBestScoreText.text = "BEST SCORE\n" + bestScore;
-        
+        if (GameMode.IsVsBot && VsBotResultText != null)
+        {
+            if (score > botScore)
+            {
+                VsBotResultText.text = "You win!";
+            }
+            else if (score < botScore)
+            {
+                VsBotResultText.text = "Bot wins!";
+            }
+            else
+            {
+                VsBotResultText.text = "Tie!";
+            }
+        }
+        else if (VsBotResultText != null)
+        {
+            VsBotResultText.text = string.Empty;
+        }
+
         playingBackgroungMusic.Pause();
         playingBackgroungMusicTime = playingBackgroungMusic.time;
         PlayerPrefs.Save();
@@ -138,12 +199,9 @@ public class GameController : MonoBehaviour
 
     public void Restart()
     {
-        float chance = Random.Range(1, 6);
-        Debug.Log(chance);
-        if (chance == 1)
+        if (adsManager != null)
         {
-            adsManager.LoadAd();
-            adsManager.ShowAd();
+            adsManager.ShowAdOrLoadScene();
         }
         else
         {
