@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -25,7 +24,6 @@ public class GameController : MonoBehaviour
 
     private int score;
     private int botScore;
-    public static int scoreChange;
     private int bestScore;
     private static float playingBackgroungMusicTime;
     private AudioSource playingBackgroungMusic;
@@ -86,26 +84,16 @@ public class GameController : MonoBehaviour
         }
         RefreshPlayingScoreTexts();
     }
-    float _time;
-    [SerializeField] float _interval = 2f;
-
     void Start()
     {
         Time.timeScale = 1;
-        _time = 0f;
         InvokeRepeating("addScore", 1f, 1f);
     }
-
-    private float lastUpdate = 0f;
     void Update()
     {
         if (!IsGameOver && Input.GetKeyDown(KeyCode.Escape))
         {
             PauseMenuToggle();
-        }
-        if (score == 20)
-        {
-            scoreChange = score;
         }
     }
     private void addScore()
@@ -139,9 +127,10 @@ public class GameController : MonoBehaviour
 
     public void GameOver()
     {
+        if (IsGameOver) return;
         IsGameOver = true;
         StartCoroutine(boomEffect());
-        coinsManager.adCoins(score * 10);        
+        CoinWallet.Add(score * 10);
         CancelInvoke("addScore");
         if (Score > BestScore)
         {
@@ -149,18 +138,24 @@ public class GameController : MonoBehaviour
             PlayerPrefs.SetInt(MainController.Prefs_BestScore_Key, BestScore);
         }
         
-        // Save level-specific score
-        int currentLevel = LevelManager.GetCurrentLevel();
-        string levelScoreKey = $"Level_{currentLevel}_BestScore";
-        int levelBestScore = PlayerPrefs.GetInt(levelScoreKey, 0);
-        if (score > levelBestScore)
+        // LevelProgressTracker owns the per-level best score; only fall back to writing it
+        // directly when a scene has no tracker.
+        if (LevelProgressTracker.Instance != null)
         {
-            PlayerPrefs.SetInt(levelScoreKey, score);
+            LevelProgressTracker.Instance.UpdateProgressByScore(score);
         }
-        
-        ColorEffect.ColorIndex++;
-        PlayerPrefs.SetInt(MainController.Prefs_ColorIndex_Key, ColorEffect.ColorIndex);
-        ColorEffect.ColorIndex--;
+        else
+        {
+            string levelScoreKey = GameKeys.LevelBestScore(LevelManager.GetCurrentLevel());
+            if (score > PlayerPrefs.GetInt(levelScoreKey, 0))
+            {
+                PlayerPrefs.SetInt(levelScoreKey, score);
+            }
+        }
+
+        // Advance the saved theme colour for the next run (wraps around the palette).
+        PlayerPrefs.SetInt(MainController.Prefs_ColorIndex_Key,
+            (ColorEffect.ColorIndex + 1) % ColorEffect.ThemeColors.Length);
         PlayingUI.SetActive(false);
         GameOverScoreText.text = "SCORE\n" + score;
         GameOverBestScoreText.text = "BEST SCORE\n" + bestScore;
@@ -205,15 +200,16 @@ public class GameController : MonoBehaviour
         }
         else
         {
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene(GameKeys.PlayScene);
         }
     }
 
     public void MainMenu()
     {
-        SceneManager.LoadScene(0);
         IsGameOver = false;
         IsGamePaused = false;
+        Time.timeScale = 1;
+        SceneManager.LoadScene(GameKeys.MainMenuScene);
     }
 
     public void PauseMenuToggle()

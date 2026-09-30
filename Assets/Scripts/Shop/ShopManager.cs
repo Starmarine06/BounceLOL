@@ -36,9 +36,8 @@ public class ShopManager : MonoBehaviour
     public Text notEnoughText;
     public float notEnoughDuration = 2f;
 
-    private const string CoinsKey = "Coins";
-    private const string SelectedSkinKey = "selectedOption";
-    private const string SelectedTrailKey = "Trail";
+    private const string SelectedSkinKey = GameKeys.SelectedSkin;
+    private const string SelectedTrailKey = GameKeys.SelectedTrail;
 
     private void Awake()
     {
@@ -56,14 +55,12 @@ public class ShopManager : MonoBehaviour
 
     public int GetCoins()
     {
-        return PlayerPrefs.GetInt(CoinsKey, 0);
+        return CoinWallet.Balance;
     }
 
     public void AddCoins(int amount)
     {
-        int next = Mathf.Max(0, GetCoins() + amount);
-        PlayerPrefs.SetInt(CoinsKey, next);
-        PlayerPrefs.Save();
+        CoinWallet.Add(amount);
         RefreshCoinsUi();
     }
 
@@ -118,14 +115,12 @@ public class ShopManager : MonoBehaviour
         int cost = GetCost(itemType, itemIndex);
         if (cost < 0) return false;
 
-        int coins = GetCoins();
-        if (coins < cost)
+        if (!CoinWallet.TrySpend(cost))
         {
             ShowNotEnough();
             return false;
         }
 
-        PlayerPrefs.SetInt(CoinsKey, coins - cost);
         PlayerPrefs.SetInt(GetOwnedKey(itemType, itemIndex), 1);
         Equip(itemType, itemIndex);
         PlayerPrefs.Save();

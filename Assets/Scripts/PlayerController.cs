@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +9,6 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem boom;
     public Animator animator;
 
-    private Rigidbody2D rb;
     private GameController gc;
 
     private Vector3 direction;
@@ -25,28 +24,34 @@ public class PlayerController : MonoBehaviour
     }
     void Awake()
     {
-        //rb = GetComponent<Rigidbody2D>();
         gc = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         animator = GetComponent<Animator>();
-        //animator.enabled = false;
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (GameController.IsGameOver || GameController.IsGamePaused)
+        {
+            return;
+        }
+
+        if (TapPressed())
         {
             Flap();
         }
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began)
-            {
-                Flap();
-            }
-        }
         direction.y += gravity * Time.deltaTime;
         transform.position += direction * Time.deltaTime;
+    }
+
+    // Touch and mouse are mutually exclusive: Unity also emulates a mouse click from a
+    // touch on mobile, so checking both would flap twice per tap.
+    private static bool TapPressed()
+    {
+        if (Input.touchCount > 0)
+        {
+            return Input.GetTouch(0).phase == TouchPhase.Began;
+        }
+        return Input.GetMouseButtonDown(0);
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -55,19 +60,13 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("Game Over");
             gc.GameOver();
-            //boom.transform.position = this.transform.position;
-            //boom.Play();
         }
     }
 
     public void Flap()
     {
-        //animator.enabled = true;
         click.transform.position = this.transform.position;
         click.Play();
         direction = Vector3.up * strength;
-        //animator.Play("Base Layer.rotation", 0, 0);
-        //Debug.Log(direction);
-
     }
 }

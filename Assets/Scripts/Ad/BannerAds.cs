@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using GoogleMobileAds.Api;
 
@@ -15,14 +16,30 @@ public class BannerAds : MonoBehaviour
             return;
         }
 
-        bannerView = new BannerView(_adUnitId, AdSize.IABBanner, AdPosition.BottomRight);
+        if (AdsInitializer.IsInitialized)
+        {
+            CreateBanner();
+            return;
+        }
+
+        MobileAds.Initialize(initStatus =>
+        {
+            CreateBanner();
+        });
+    }
+
+    private void CreateBanner()
+    {
+        // Adaptive banners fill far better than a custom 400x120 size.
+        AdSize adSize = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
+        bannerView = new BannerView(_adUnitId, adSize, AdPosition.Bottom);
         LoadBanner();
     }
 
     private void LoadBanner()
     {
         bannerView.LoadAd(new AdRequest());
-        Debug.Log("Banner Loaded");
+        Debug.Log("Banner load requested.");
     }
 
     private void OnDestroy()

@@ -28,7 +28,7 @@ public class LevelSelectionUI : MonoBehaviour
     private void Start()
     {
         // Load the last selected level
-        currentPreviewLevel = PlayerPrefs.GetInt("SelectedLevel", 1);
+        currentPreviewLevel = PlayerPrefs.GetInt(GameKeys.SelectedLevel, 1);
         currentPreviewLevel = Mathf.Clamp(currentPreviewLevel, 1, MaxLevels);
 
         // Setup button listeners
@@ -109,10 +109,10 @@ public class LevelSelectionUI : MonoBehaviour
         string scoreKey = $"Level_{currentPreviewLevel}_BestScore";
         int levelBestScore = PlayerPrefs.GetInt(scoreKey, 0);
         
-        // Update progress bar (divide by 100)
-        float normalizedProgress = levelBestScore / 100f;
+        // Update progress bar using LevelManager progress value
+        float progress = LevelManager.GetLevelProgress(currentPreviewLevel);
         if (progressSlider != null)
-            progressSlider.value = normalizedProgress;
+            progressSlider.value = progress;
         
         // Update progress text with the actual score
         if (progressText != null)
@@ -124,7 +124,7 @@ public class LevelSelectionUI : MonoBehaviour
     private void PlayCurrentLevel()
     {
         LevelManager.SetLevel(currentPreviewLevel);
-        PlayerPrefs.SetInt("SelectedLevel", currentPreviewLevel);
+        PlayerPrefs.SetInt(GameKeys.SelectedLevel, currentPreviewLevel);
         PlayerPrefs.Save();
         
         SceneManager.LoadScene("Play");

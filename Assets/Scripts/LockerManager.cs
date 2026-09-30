@@ -52,7 +52,7 @@ public class LockerManager : MonoBehaviour
     public void EquipTrail(int localIndex)
     {
         // write PlayerPrefs "Trail" so your LineRendererScript reads it
-        PlayerPrefs.SetInt("Trail", localIndex);
+        PlayerPrefs.SetInt(GameKeys.SelectedTrail, localIndex);
         PlayerPrefs.Save();
 
         // call ButtonT.SelectTrail() if present on displayed slot (optional)

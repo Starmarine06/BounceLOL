@@ -17,9 +17,9 @@ public class GameSkin : MonoBehaviour
         }
     }
 
-    void Update()
+    void Start()
     {
-        int selected = Mathf.Clamp(PlayerPrefs.GetInt("selectedOption", 0), 0, Sprite.Length - 1);
+        int selected = Mathf.Clamp(PlayerPrefs.GetInt(GameKeys.SelectedSkin, 0), 0, Sprite.Length - 1);
         if (image != null && Sprite != null && Sprite.Length > 0)
         {
             image.sprite = Sprite[selected];
@@ -27,7 +27,7 @@ public class GameSkin : MonoBehaviour
 
         if (trail != null)
         {
-            trail.gameObject.SetActive(PlayerPrefs.GetInt("Trail", 0) > 0);
+            trail.gameObject.SetActive(PlayerPrefs.GetInt(GameKeys.SelectedTrail, 0) > 0);
         }
     }
 }

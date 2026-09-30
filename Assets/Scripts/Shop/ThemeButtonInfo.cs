@@ -19,7 +19,7 @@ public class ThemeButtonInfo : MonoBehaviour
     private void Awake()
     {
         if (button == null) button = GetComponent<Button>();
-        if (shop == null) shop = FindObjectOfType<ThemeShopManager>();
+        if (shop == null) shop = FindAnyObjectByType<ThemeShopManager>();
         button.onClick.AddListener(OnClickPurchaseOrEquip);
     }
 
@@ -49,7 +49,7 @@ public class ThemeButtonInfo : MonoBehaviour
 
     public void OnClickPurchaseOrEquip()
     {
-        if (shop == null) shop = FindObjectOfType<ThemeShopManager>();
+        if (shop == null) shop = FindAnyObjectByType<ThemeShopManager>();
         if (shop == null) return;
 
         if (shop.IsOwned(itemIndex))
@@ -66,7 +66,7 @@ public class ThemeButtonInfo : MonoBehaviour
 
     public void Refresh()
     {
-        if (shop == null) shop = FindObjectOfType<ThemeShopManager>();
+        if (shop == null) shop = FindAnyObjectByType<ThemeShopManager>();
         if (shop == null) return;
 
         int cost = shop.GetCost(itemIndex);

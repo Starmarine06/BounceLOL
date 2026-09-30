@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,6 +54,7 @@ public class SoundButton : MonoBehaviour
             onImage.SetActive(false);
             offImage.SetActive(true);
             PlayerPrefs.SetInt(MainController.Prefs_Sounds_Key, 0);
+            PlayerPrefs.SetInt("Audio", 0);
         }
         else
         {
@@ -65,6 +66,7 @@ public class SoundButton : MonoBehaviour
             offImage.SetActive(false);
             onImage.SetActive(true);
             PlayerPrefs.SetInt(MainController.Prefs_Sounds_Key, 1);
+            PlayerPrefs.SetInt("Audio", 1);
         }
         PlayerPrefs.Save();
     }

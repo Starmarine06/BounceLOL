@@ -31,6 +31,7 @@ public class ColorEffect : MonoBehaviour
         new Color[] {new Color(0.376f, 0.490f, 0.545f), new Color(0.925f, 0.937f, 0.945f)}, // 19
     };
     private static int colorIndex;
+    private Camera cam;
 
     public static int ColorIndex
     {
@@ -53,6 +54,7 @@ public class ColorEffect : MonoBehaviour
 
     void Awake()
     {
+        cam = Camera.main;
         int themePalette = PlayerPrefs.GetInt(ThemeShopManager.ThemePaletteIndexKey, -1);
         if (themePalette >= 0 && themePalette < ThemeColors.Length)
         {
@@ -67,7 +69,7 @@ public class ColorEffect : MonoBehaviour
             }
         }
 
-        Camera.main.backgroundColor = ThemeColors[colorIndex][1];
+        cam.backgroundColor = ThemeColors[colorIndex][1];
         ObstacleColor.BaseColor = ThemeColors[colorIndex][0];
         ParticleColor.BaseColor = ThemeColors[colorIndex][0];
         ImgColor.BaseColor = ThemeColors[colorIndex][0];
@@ -77,7 +79,7 @@ public class ColorEffect : MonoBehaviour
     {
         if (SceneManager.GetActiveScene().name == "Play")
         {
-            InvokeRepeating("cahngeColorIndex", ChangeDelay, ChangeDelay);
+            InvokeRepeating("ChangeColorIndex", ChangeDelay, ChangeDelay);
         }
     }
 
@@ -87,19 +89,19 @@ public class ColorEffect : MonoBehaviour
         {
             ObstacleColor.BaseColor = Color.Lerp(ObstacleColor.BaseColor, ThemeColors[ColorIndex][0], ChangeDuration);
             ParticleColor.BaseColor = Color.Lerp(ParticleColor.BaseColor, ThemeColors[ColorIndex][0], ChangeDuration);
-            ImgColor.BaseColor = Color.Lerp(ParticleColor.BaseColor, ThemeColors[ColorIndex][0], ChangeDuration);
+            ImgColor.BaseColor = Color.Lerp(ImgColor.BaseColor, ThemeColors[ColorIndex][0], ChangeDuration);
         }
     }
 
     void LateUpdate()
     {
-        if (!Camera.main.backgroundColor.Equals(ThemeColors[ColorIndex][1]))
+        if (!cam.backgroundColor.Equals(ThemeColors[ColorIndex][1]))
         {
-            Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, ThemeColors[ColorIndex][1], ChangeDuration);
+            cam.backgroundColor = Color.Lerp(cam.backgroundColor, ThemeColors[ColorIndex][1], ChangeDuration);
         }
     }
 
-    private void cahngeColorIndex()
+    private void ChangeColorIndex()
     {
         ColorIndex++;
     }

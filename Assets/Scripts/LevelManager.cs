@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
-    private static int CurrentLevel;
+    private static int CurrentLevel = 1;
     
     // Level configuration: Store all level parameters
     [System.Serializable]
@@ -18,7 +18,7 @@ public class LevelManager : MonoBehaviour
         public string obstaclePrefabName; // Name of the obstacle prefab to use
     }
 
-    private static LevelConfig[] levelConfigs = new LevelConfig[5]
+    private static readonly LevelConfig[] levelConfigs = new LevelConfig[]
     {
         // Level 1 - Easy
         new LevelConfig
@@ -72,16 +72,18 @@ public class LevelManager : MonoBehaviour
         }
     };
 
+    public static int LevelCount => levelConfigs.Length;
+
     private void Awake()
     {
         // Load the level that was selected in another scene
-        CurrentLevel = PlayerPrefs.GetInt("SelectedLevel", 1);
+        CurrentLevel = PlayerPrefs.GetInt(GameKeys.SelectedLevel, 1);
         
         // Clamp level to valid range
-        CurrentLevel = Mathf.Clamp(CurrentLevel, 1, 5);
+        CurrentLevel = Mathf.Clamp(CurrentLevel, 1, LevelCount);
         
         // Save it back so it persists
-        PlayerPrefs.SetInt("SelectedLevel", CurrentLevel);
+        PlayerPrefs.SetInt(GameKeys.SelectedLevel, CurrentLevel);
         PlayerPrefs.Save();
     }
 
@@ -90,8 +92,8 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     public static void SetLevel(int level)
     {
-        CurrentLevel = Mathf.Clamp(level, 1, 5);
-        PlayerPrefs.SetInt("SelectedLevel", CurrentLevel);
+        CurrentLevel = Mathf.Clamp(level, 1, LevelCount);
+        PlayerPrefs.SetInt(GameKeys.SelectedLevel, CurrentLevel);
         PlayerPrefs.Save();
     }
 
@@ -108,7 +110,8 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     public static LevelConfig GetCurrentLevelConfig()
     {
-        return levelConfigs[CurrentLevel - 1];
+        int level = Mathf.Clamp(CurrentLevel, 1, levelConfigs.Length);
+        return levelConfigs[level - 1];
     }
 
     /// <summary>
@@ -116,7 +119,7 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     public static LevelConfig GetLevelConfig(int level)
     {
-        level = Mathf.Clamp(level, 1, 5);
+        level = Mathf.Clamp(level, 1, LevelCount);
         return levelConfigs[level - 1];
     }
 
@@ -125,9 +128,8 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     public static float GetLevelProgress(int level)
     {
-        level = Mathf.Clamp(level, 1, 5);
-        string progressKey = $"Level_{level}_Progress";
-        return PlayerPrefs.GetFloat(progressKey, 0f);
+        level = Mathf.Clamp(level, 1, LevelCount);
+        return PlayerPrefs.GetFloat(GameKeys.LevelProgress(level), 0f);
     }
 
     /// <summary>
@@ -135,10 +137,9 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     public static void SetLevelProgress(int level, float progress)
     {
-        level = Mathf.Clamp(level, 1, 5);
+        level = Mathf.Clamp(level, 1, LevelCount);
         progress = Mathf.Clamp01(progress); // Clamp between 0 and 1
-        string progressKey = $"Level_{level}_Progress";
-        PlayerPrefs.SetFloat(progressKey, progress);
+        PlayerPrefs.SetFloat(GameKeys.LevelProgress(level), progress);
         PlayerPrefs.Save();
     }
 
@@ -180,7 +181,7 @@ public class LevelManager : MonoBehaviour
     public static int GetCompletedLevelsCount()
     {
         int count = 0;
-        for (int i = 1; i <= 5; i++)
+        for (int i = 1; i <= LevelCount; i++)
         {
             if (IsLevelCompleted(i))
                 count++;

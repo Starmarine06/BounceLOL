@@ -16,6 +16,7 @@ public class LineRendererScript : MonoBehaviour
     LineRenderer line;
     //position data
     List<Vector3> points;
+    Vector3[] positionBuffer = new Vector3[64]; // reused every frame to avoid per-frame allocations
     Queue<float> spawnTimes = new Queue<float>(); //list of spawn times, to simulate lifetime. Back of the queue is vertex 1, front of the queue is the end of the trail.
                                                   //Length of this queue is one less than the number of positions in the linerenderer, since the linerenderer always has a non-solidified vertex at the object's position.
 
@@ -25,7 +26,7 @@ public class LineRendererScript : MonoBehaviour
         line = GetComponent<LineRenderer>();
         line.useWorldSpace = true;
         points = new List<Vector3>() { transform.position }; //indices 1 - end are solidified points, index 0 is always transform.position
-        line.SetPositions(points.ToArray());
+        ApplyPositions();
         ApplySelectedTrailMaterial();
     }
 
@@ -44,10 +45,6 @@ public class LineRendererScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Selection == false)
-        {
-            ApplySelectedTrailMaterial();
-        }
         //cull based on lifetime
         while (spawnTimes.Count > 0 && spawnTimes.Peek() + lifetime < Time.time)
         {
@@ -71,15 +68,24 @@ public class LineRendererScript : MonoBehaviour
         //update index 0;
         points[0] = transform.position;
 
-        //save result
+        ApplyPositions();
+    }
+
+    private void ApplyPositions()
+    {
+        if (positionBuffer.Length < points.Count)
+        {
+            System.Array.Resize(ref positionBuffer, Mathf.NextPowerOfTwo(points.Count));
+        }
+        points.CopyTo(positionBuffer);
         line.positionCount = points.Count;
-        line.SetPositions(points.ToArray());
+        line.SetPositions(positionBuffer);
     }
 
     private void ApplySelectedTrailMaterial()
     {
         if (material == null || material.Length == 0 || line == null) return;
-        int selected = Mathf.Clamp(PlayerPrefs.GetInt("Trail", 0), 0, material.Length - 1);
+        int selected = Mathf.Clamp(PlayerPrefs.GetInt(GameKeys.SelectedTrail, 0), 0, material.Length - 1);
         line.material = material[selected];
     }
 }

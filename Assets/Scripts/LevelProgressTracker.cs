@@ -10,7 +10,7 @@ public class LevelProgressTracker : MonoBehaviour
 
     [SerializeField] private Slider progressSlider;
     [SerializeField] private Text progressText;
-    [SerializeField] private float maxScoreForCompletion = 1000f; // Score needed to "complete" level
+    [SerializeField] private float maxScoreForCompletion = 100f; // Score needed to "complete" level
 
     private float currentProgress = 0f;
     private int currentLevel;
@@ -43,7 +43,7 @@ public class LevelProgressTracker : MonoBehaviour
 
     private void LoadLevelBestScore()
     {
-        string key = $"Level_{currentLevel}_BestScore";
+        string key = GameKeys.LevelBestScore(currentLevel);
         levelBestScore = PlayerPrefs.GetInt(key, 0);
         
         // Calculate progress from saved best score
@@ -57,7 +57,7 @@ public class LevelProgressTracker : MonoBehaviour
     /// </summary>
     private void SaveLevelBestScore()
     {
-        string key = $"Level_{currentLevel}_BestScore";
+        string key = GameKeys.LevelBestScore(currentLevel);
         PlayerPrefs.SetInt(key, levelBestScore);
         PlayerPrefs.Save();
         
@@ -141,7 +141,7 @@ public class LevelProgressTracker : MonoBehaviour
     public void ReturnToLevelSelection()
     {
         LevelManager.SetLevelProgress(currentLevel, currentProgress);
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene(GameKeys.MainMenuScene);
     }
 
     /// <summary>
@@ -149,6 +149,6 @@ public class LevelProgressTracker : MonoBehaviour
     /// </summary>
     public void RetryLevel()
     {
-        SceneManager.LoadScene("Play");
+        SceneManager.LoadScene(GameKeys.PlayScene);
     }
 }

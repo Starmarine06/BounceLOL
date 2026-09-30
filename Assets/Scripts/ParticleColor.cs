@@ -6,9 +6,19 @@ public class ParticleColor : MonoBehaviour
 {
     public static Color BaseColor;
 
+    private ParticleSystem ps;
+
+    void Start()
+    {
+        ps = GetComponent<ParticleSystem>();
+    }
+
     void Update()
     {
-        ParticleSystem.MainModule settings = GetComponent<ParticleSystem>().main;
-        settings.startColor = new ParticleSystem.MinMaxGradient(BaseColor);
+        if (ps != null)
+        {
+            ParticleSystem.MainModule settings = ps.main;
+            settings.startColor = new ParticleSystem.MinMaxGradient(BaseColor);
+        }
     }
 }
