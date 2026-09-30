@@ -20,16 +20,16 @@ public class CharacterManager : MonoBehaviour
     void Start()
     {
         //Selected Option
-        if (PlayerPrefs.HasKey("selectedOption"))
-        {
-            selectedOption = 0;
-        }
-        else
+        if (PlayerPrefs.HasKey(GameKeys.SelectedSkin))
         {
             Load();
         }
+        else
+        {
+            selectedOption = 0;
+        }
         UpdateCharacter(selectedOption);
-        PlayerPrefs.SetInt("0", 1);
+        PlayerPrefs.SetInt("Spurchased0", 1); // Set default skin to owned using shop key format
         titleText.enabled = false;
     }
 
@@ -77,17 +77,20 @@ public class CharacterManager : MonoBehaviour
 
     private void Load()
     {
-        selectedOption = PlayerPrefs.GetInt("selectedOption");
+        selectedOption = PlayerPrefs.GetInt(GameKeys.SelectedSkin);
     }
 
     private void Save()
     {
-        PlayerPrefs.SetInt("selectedOption", selectedOption);
+        PlayerPrefs.SetInt(GameKeys.SelectedSkin, selectedOption);
+        PlayerPrefs.Save();
     }
 
     public void ChangeScene(int sceneID)
     {
-        if(PlayerPrefs.GetInt(PlayerPrefs.GetInt("selectedOption").ToString()) == 1)
+        // Align with ShopManager key format: "Spurchased" + index. Default skin 0 is always free/owned.
+        bool isOwned = selectedOption == 0 || PlayerPrefs.GetInt("Spurchased" + selectedOption, 0) == 1;
+        if (isOwned)
         {
             SceneManager.LoadScene(sceneID);
         }

@@ -11,6 +11,8 @@ public class RewardedCoinChain : MonoBehaviour
 {
     [SerializeField] private string adUnitId;
     [SerializeField] private int coinsPerAdStep = 500;
+    [Tooltip("Upper limit on consecutive ads so a large purchase never forces dozens of ads.")]
+    [SerializeField] private int maxAdsPerChain = 4;
     [Tooltip("If coinAmount is not a multiple of coinsPerAdStep, grant the remainder together with the last reward.")]
     [SerializeField] private bool includeRemainderInFinalGrant = true;
 
@@ -37,7 +39,6 @@ public class RewardedCoinChain : MonoBehaviour
 
     public void BeginRewardedChain(int coinAmount)
     {
-        bool grantIfBelowStep = true;
         if (chainActive)
         {
             Log("A rewarded chain is already running.");
@@ -57,20 +58,7 @@ public class RewardedCoinChain : MonoBehaviour
         }
 
         targetCoinAmount = coinAmount;
-        adsRequired = coinAmount / coinsPerAdStep;
-
-        if (adsRequired <= 0)
-        {
-            if (grantIfBelowStep)
-            {
-                GrantCoinsAndFinish(coinAmount);
-            }
-            else
-            {
-                OnChainFailed?.Invoke("Amount is below one ad step; no ads required.");
-            }
-            return;
-        }
+        adsRequired = Mathf.Clamp(coinAmount / coinsPerAdStep, 1, Mathf.Max(1, maxAdsPerChain));
 
         chainActive = true;
         adsCompleted = 0;
@@ -80,7 +68,11 @@ public class RewardedCoinChain : MonoBehaviour
 
     private void LoadThenShow()
     {
-        if (isLoading) return;
+        if (isLoading)
+        {
+            FailChain("An ad is already loading.");
+            return;
+        }
 
         if (rewardedAd != null)
         {
@@ -182,14 +174,7 @@ public class RewardedCoinChain : MonoBehaviour
 
     private void GrantCoinsAndFinish(int coins)
     {
-        int current = PlayerPrefs.GetInt("Coins", 0);
-        PlayerPrefs.SetInt("Coins", current + coins);
-        PlayerPrefs.Save();
-
-        if (coinsManager != null && coinsManager.coinText != null)
-        {
-            coinsManager.coinText.text = "Money: $" + PlayerPrefs.GetInt("Coins", 0);
-        }
+        CoinWallet.Add(coins);
 
         chainActive = false;
         targetCoinAmount = 0;

@@ -25,6 +25,6 @@
 public static class GPGSIds
 {
         public const string leaderboard_bouncelol = "CgkIoMn9kpQCEAIQAA"; // <GPGSID>
-
+        public const string achievement_addict = "CgkIlYqY77IXEAIQAQ"; // <GPGSID>
 }
 

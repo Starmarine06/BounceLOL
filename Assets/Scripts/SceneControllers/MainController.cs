@@ -5,7 +5,7 @@ using UnityEngine;
 public class MainController : MonoBehaviour
 {
     // PlayerPrefs constants
-    public const string Prefs_BestScore_Key = "best_score";
+    public const string Prefs_BestScore_Key = GameKeys.BestScore;
     public const int Prefs_BestScore_DefaultValue = 0;
 
     public const string Prefs_ColorIndex_Key = "color_index";

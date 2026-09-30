@@ -6,6 +6,6 @@ public class ButtonT : MonoBehaviour
 
     public void SelectTrail()
     {
-        PlayerPrefs.SetInt("Trail", ItemID);
+        PlayerPrefs.SetInt(GameKeys.SelectedTrail, ItemID);
     }
 }

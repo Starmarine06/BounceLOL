@@ -81,20 +81,8 @@ public class RewardedAdsButton : MonoBehaviour
 
     private void GrantReward()
     {
-        int currentCoins = PlayerPrefs.GetInt("Coins", 0);
-        PlayerPrefs.SetInt("Coins", currentCoins + rewardCoinsPerView);
-        PlayerPrefs.Save();
-        if (coinsManager != null)
-        {
-            coinsManager.coinText.text = "Money: $" + PlayerPrefs.GetInt("Coins", 0);
-        }
+        CoinWallet.Add(rewardCoinsPerView);
         LoadAd();
-    }
-
-    // Backward-compatible method name kept for older event wiring.
-    public void OnUnityAdsShowComplete(string ignoredAdUnitId)
-    {
-        GrantReward();
     }
 
     void OnDestroy()

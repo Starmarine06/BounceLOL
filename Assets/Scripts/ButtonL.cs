@@ -6,7 +6,7 @@ public class ButtonL : MonoBehaviour
 
     public void SelectCharacter()
     {
-        PlayerPrefs.SetInt("selectedOption", ItemID);
+        PlayerPrefs.SetInt(GameKeys.SelectedSkin, ItemID);
     }
     
 }

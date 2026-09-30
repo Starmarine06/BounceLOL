@@ -20,7 +20,7 @@ public class ButtonInfo : MonoBehaviour
     private void Awake()
     {
         if (button == null) button = GetComponent<Button>();
-        if (shop == null) shop = FindObjectOfType<ShopManager>();
+        if (shop == null) shop = FindAnyObjectByType<ShopManager>();
         button.onClick.AddListener(OnClickPurchaseOrEquip);
     }
 
@@ -50,7 +50,7 @@ public class ButtonInfo : MonoBehaviour
 
     public void OnClickPurchaseOrEquip()
     {
-        if (shop == null) shop = FindObjectOfType<ShopManager>();
+        if (shop == null) shop = FindAnyObjectByType<ShopManager>();
         if (shop == null) return;
 
         if (shop.IsOwned(itemType, itemIndex))
@@ -67,7 +67,7 @@ public class ButtonInfo : MonoBehaviour
 
     public void Refresh()
     {
-        if (shop == null) shop = FindObjectOfType<ShopManager>();
+        if (shop == null) shop = FindAnyObjectByType<ShopManager>();
         if (shop == null) return;
 
         int cost = shop.GetCost(itemType, itemIndex);

@@ -11,6 +11,9 @@ public class InterstitialAds : MonoBehaviour
     [SerializeField] float chanceToShow = 0.3f;
     private InterstitialAd interstitialAd;
     private Action pendingAfterCloseAction;
+    private const int MaxLoadRetries = 3;
+    private const float RetryDelaySeconds = 10f;
+    private int loadRetries;
 
     // Load content to the Ad Unit:
     public void LoadAd()
@@ -35,8 +38,14 @@ public class InterstitialAds : MonoBehaviour
             {
                 // The ad failed to load.
                 Debug.LogError("Interstitial load failed: " + error);
+                if (loadRetries++ < MaxLoadRetries)
+                {
+                    Invoke(nameof(LoadAd), RetryDelaySeconds);
+                }
                 return;
             }
+
+            loadRetries = 0;
 
             // The ad loaded successfully.
             interstitialAd = ad;
@@ -49,17 +58,17 @@ public class InterstitialAds : MonoBehaviour
 
     }
 
-    // Show ad if loaded, otherwise fallback action runs.
-    public void ShowAd(Action onAdUnavailable)
+    // Shows the ad if loaded and runs the callback when it closes; if no ad is ready the callback runs immediately.
+    public void ShowAd(Action afterAdOrIfUnavailable)
     {
         if (interstitialAd != null && interstitialAd.CanShowAd())
         {
-            pendingAfterCloseAction = onAdUnavailable;
+            pendingAfterCloseAction = afterAdOrIfUnavailable;
             interstitialAd.Show();
             return;
         }
 
-        onAdUnavailable?.Invoke();
+        afterAdOrIfUnavailable?.Invoke();
     }
 
     public void ShowAdOrLoadScene()

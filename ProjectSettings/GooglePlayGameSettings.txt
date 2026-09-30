@@ -1,9 +1,9 @@
 lastUpgrade=20100
 proj.pluginVersion=2.1.0
-proj.AppId=74127991968
-and.BundleId=dev.starmarine06.com
+proj.AppId=803928933653
+and.BundleId=nbr.starmarine06.com
 proj.classDir=Assets
-proj.ConstantsClassName=GPGSIds
-and.ResourceData=%3c%3fxml+version%3d%221.0%22+encoding%3d%22utf-8%22%3f%3e%0d%0a%3c%21--Google+Play+game+services+IDs.+Save+this+file+as+res%2fvalues%2fgames-ids.xml+in+your+project.--%3e%0d%0a%3cresources%3e%0d%0a++%3c%21--app_id--%3e%0d%0a++%3cstring+name%3d%22app_id%22+translatable%3d%22false%22%3e74127991968%3c%2fstring%3e%0d%0a++%3c%21--package_name--%3e%0d%0a++%3cstring+name%3d%22package_name%22+translatable%3d%22false%22%3edev.starmarine06.com%3c%2fstring%3e%0d%0a++%3c%21--leaderboard+BounceLOL--%3e%0d%0a++%3cstring+name%3d%22leaderboard_bouncelol%22+translatable%3d%22false%22%3eCgkIoMn9kpQCEAIQAA%3c%2fstring%3e%0d%0a%3c%2fresources%3e
-and.ClientId=
+proj.ConstantsClassName=BounceLOL.GPGSIds
+and.ResourceData=%3c%3fxml+version%3d%221.0%22+encoding%3d%22utf-8%22%3f%3e%0d%0a%3c%21--Google+Play+game+services+IDs.+Save+this+file+as+res%2fvalues%2fgames-ids.xml+in+your+project.--%3e%0d%0a%3cresources%3e%0d%0a++%3c%21--app_id--%3e%0d%0a++%3cstring+name%3d%22app_id%22+translatable%3d%22false%22%3e803928933653%3c%2fstring%3e%0d%0a++%3c%21--package_name--%3e%0d%0a++%3cstring+name%3d%22package_name%22+translatable%3d%22false%22%3enbr.starmarine06.com%3c%2fstring%3e%0d%0a++%3c%21--achievement+Addict--%3e%0d%0a++%3cstring+name%3d%22achievement_addict%22+translatable%3d%22false%22%3eCgkIlYqY77IXEAIQAQ%3c%2fstring%3e%0d%0a++%3c%21--leaderboard+BounceLOL+Leaderboard--%3e%0d%0a++%3cstring+name%3d%22leaderboard_bouncelol_leaderboard%22+translatable%3d%22false%22%3eCgkIlYqY77IXEAIQAg%3c%2fstring%3e%0d%0a%3c%2fresources%3e
+and.ClientId=803928933653-sjj1n9bn8up1vl04q3kuc4j7k43hgah4.apps.googleusercontent.com
 android.SetupDone=true

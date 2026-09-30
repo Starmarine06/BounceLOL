@@ -1,40 +1,53 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>Shows the coin balance in the UI. All balance changes go through <see cref="CoinWallet"/>.</summary>
 public class CoinsManager : MonoBehaviour
 {
     public Text coinText;
-    public int coins;
+
+    public int coins => CoinWallet.Balance;
+
+    // Kept so the serialized field on existing scenes/prefabs is not lost.
+    [HideInInspector]
     public int Value;
-    void Start()
+
+    void OnEnable()
     {
-        coins = PlayerPrefs.GetInt("Coins");
-        coinText.text = coins.ToString();
+        CoinWallet.Changed += UpdateVisuals;
+        UpdateVisuals(CoinWallet.Balance);
     }
 
-    // Update is called once per frame
+    void OnDisable()
+    {
+        CoinWallet.Changed -= UpdateVisuals;
+    }
+
     void Update()
     {
-        coins = PlayerPrefs.GetInt("Coins");
-        coinText.text = "Money: $" + PlayerPrefs.GetInt("Coins").ToString();
-        if(Input.GetKeyDown(KeyCode.C))
+        #if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.C))
         {
             adCoins(100);
+        }
+        #endif
+    }
+
+    public void UpdateVisuals(int coinCount)
+    {
+        if (coinText != null)
+        {
+            coinText.text = "Money: $" + coinCount;
         }
     }
 
     public void adCoins(int value)
     {
-        Value = coins + value;
-        PlayerPrefs.SetInt("Coins", Value);
-        Value = 0;
+        CoinWallet.Add(value);
     }
+
     public void removeCoins(int value)
     {
-        Value = coins - value;
-        PlayerPrefs.SetInt("Coins", Value);
-        Value = 0;
+        CoinWallet.Add(-value);
     }
 }
