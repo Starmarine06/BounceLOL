@@ -9,6 +9,8 @@ public class ObstacleGenerator : MonoBehaviour
     public int PoolSize;
     public float Speed;
     public float SpeedIncrement;
+    [Tooltip("Speed never exceeds this, so long runs stay playable.")]
+    public float MaxSpeed = 30f;
     public static float SpeedChange;
     public float Smooth;
     public Vector2 WidthRange;
@@ -18,6 +20,7 @@ public class ObstacleGenerator : MonoBehaviour
     public Transform ObstaclesContainer;
     public GameObject Obstacle;
 
+    private const float MinSpawnInterval = 0.05f; // a zero/negative wait would spawn every frame
     private float time;
     private Vector3 startPos;
     private GameObject top;
@@ -29,12 +32,12 @@ public class ObstacleGenerator : MonoBehaviour
 
     private float topInterval
     {
-        get => (topWidth - Smooth / Speed) / Speed;
+        get => Mathf.Max(MinSpawnInterval, (topWidth - Smooth / Speed) / Speed);
     }
 
     private float bottomInterval
     {
-        get => (bottomWidth - Smooth / Speed) / Speed;
+        get => Mathf.Max(MinSpawnInterval, (bottomWidth - Smooth / Speed) / Speed);
     }
 
     private Vector3 topScale
@@ -154,6 +157,6 @@ public class ObstacleGenerator : MonoBehaviour
 
     public void FixedUpdate()
     {
-        Speed += SpeedIncrement;
+        Speed = Mathf.Min(Speed + SpeedIncrement, MaxSpeed);
     }
 }

@@ -14,6 +14,7 @@ public class InterstitialAds : MonoBehaviour
     private const int MaxLoadRetries = 3;
     private const float RetryDelaySeconds = 10f;
     private int loadRetries;
+    private bool isDestroyed;
 
     // Load content to the Ad Unit:
     public void LoadAd()
@@ -42,6 +43,12 @@ public class InterstitialAds : MonoBehaviour
                 {
                     Invoke(nameof(LoadAd), RetryDelaySeconds);
                 }
+                return;
+            }
+
+            if (isDestroyed)
+            {
+                ad?.Destroy();
                 return;
             }
 
@@ -128,6 +135,7 @@ public class InterstitialAds : MonoBehaviour
 
     void OnDestroy()
     {
+        isDestroyed = true;
         if (interstitialAd != null)
         {
             Debug.Log("Destroying interstitial ad.");

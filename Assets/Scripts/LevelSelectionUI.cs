@@ -23,7 +23,7 @@ public class LevelSelectionUI : MonoBehaviour
     public Color[] difficultyColors = new Color[5];
 
     private int currentPreviewLevel = 1;
-    private const int MaxLevels = 5;
+    private static int MaxLevels => LevelManager.LevelCount;
 
     private void Start()
     {
@@ -106,7 +106,7 @@ public class LevelSelectionUI : MonoBehaviour
         }
 
         // Get best score from PlayerPrefs
-        string scoreKey = $"Level_{currentPreviewLevel}_BestScore";
+        string scoreKey = GameKeys.LevelBestScore(currentPreviewLevel);
         int levelBestScore = PlayerPrefs.GetInt(scoreKey, 0);
         
         // Update progress bar using LevelManager progress value
@@ -127,12 +127,12 @@ public class LevelSelectionUI : MonoBehaviour
         PlayerPrefs.SetInt(GameKeys.SelectedLevel, currentPreviewLevel);
         PlayerPrefs.Save();
         
-        SceneManager.LoadScene("Play");
+        SceneManager.LoadScene(GameKeys.PlayScene);
     }
 
     private void GoHome()
     {
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene(GameKeys.MainMenuScene);
     }
 
     /// <summary>

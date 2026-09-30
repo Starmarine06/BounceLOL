@@ -85,20 +85,38 @@ public class ColorEffect : MonoBehaviour
 
     void Update()
     {
-        if (!ObstacleColor.BaseColor.Equals(ThemeColors[ColorIndex][0]))
+        Color target = ThemeColors[ColorIndex][0];
+        if (!Approximately(ObstacleColor.BaseColor, target))
         {
-            ObstacleColor.BaseColor = Color.Lerp(ObstacleColor.BaseColor, ThemeColors[ColorIndex][0], ChangeDuration);
-            ParticleColor.BaseColor = Color.Lerp(ParticleColor.BaseColor, ThemeColors[ColorIndex][0], ChangeDuration);
-            ImgColor.BaseColor = Color.Lerp(ImgColor.BaseColor, ThemeColors[ColorIndex][0], ChangeDuration);
+            ObstacleColor.BaseColor = Color.Lerp(ObstacleColor.BaseColor, target, ChangeDuration);
+            ParticleColor.BaseColor = Color.Lerp(ParticleColor.BaseColor, target, ChangeDuration);
+            ImgColor.BaseColor = Color.Lerp(ImgColor.BaseColor, target, ChangeDuration);
+        }
+        else if (ObstacleColor.BaseColor != target)
+        {
+            ObstacleColor.BaseColor = ParticleColor.BaseColor = ImgColor.BaseColor = target;
         }
     }
 
     void LateUpdate()
     {
-        if (!cam.backgroundColor.Equals(ThemeColors[ColorIndex][1]))
+        Color bg = ThemeColors[ColorIndex][1];
+        if (!Approximately(cam.backgroundColor, bg))
         {
-            cam.backgroundColor = Color.Lerp(cam.backgroundColor, ThemeColors[ColorIndex][1], ChangeDuration);
+            cam.backgroundColor = Color.Lerp(cam.backgroundColor, bg, ChangeDuration);
         }
+        else if (cam.backgroundColor != bg)
+        {
+            cam.backgroundColor = bg;
+        }
+    }
+
+    // Lerp with a constant factor only ever approaches its target, so compare with a tolerance.
+    private static bool Approximately(Color a, Color b)
+    {
+        const float eps = 0.004f;
+        return Mathf.Abs(a.r - b.r) < eps && Mathf.Abs(a.g - b.g) < eps &&
+               Mathf.Abs(a.b - b.b) < eps && Mathf.Abs(a.a - b.a) < eps;
     }
 
     private void ChangeColorIndex()

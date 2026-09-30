@@ -14,6 +14,10 @@ public class PlayerController : MonoBehaviour
     private Vector3 direction;
     public float gravity = -9.8f;
     public float strength = 5f;
+    [Tooltip("Extra distance beyond the camera edge before the player counts as out of bounds.")]
+    public float outOfBoundsMargin = 1f;
+
+    private float boundsY;
 
     private void OnEnable()
     {
@@ -26,6 +30,8 @@ public class PlayerController : MonoBehaviour
     {
         gc = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         animator = GetComponent<Animator>();
+        Camera cam = Camera.main;
+        boundsY = (cam != null ? cam.orthographicSize : 5f) + outOfBoundsMargin;
     }
 
     void Update()
@@ -41,6 +47,11 @@ public class PlayerController : MonoBehaviour
         }
         direction.y += gravity * Time.deltaTime;
         transform.position += direction * Time.deltaTime;
+
+        if (Mathf.Abs(transform.position.y) > boundsY)
+        {
+            Kill();
+        }
     }
 
     // Touch and mouse are mutually exclusive: Unity also emulates a mouse click from a
@@ -61,6 +72,12 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Game Over");
             gc.GameOver();
         }
+    }
+
+    /// <summary>Ends the run. Safe to call more than once.</summary>
+    public void Kill()
+    {
+        if (gc != null) gc.GameOver();
     }
 
     public void Flap()

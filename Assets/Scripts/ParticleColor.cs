@@ -7,6 +7,8 @@ public class ParticleColor : MonoBehaviour
     public static Color BaseColor;
 
     private ParticleSystem ps;
+    private Color appliedColor;
+    private bool hasApplied;
 
     void Start()
     {
@@ -15,10 +17,12 @@ public class ParticleColor : MonoBehaviour
 
     void Update()
     {
-        if (ps != null)
+        if (ps != null && (!hasApplied || appliedColor != BaseColor))
         {
             ParticleSystem.MainModule settings = ps.main;
             settings.startColor = new ParticleSystem.MinMaxGradient(BaseColor);
+            appliedColor = BaseColor;
+            hasApplied = true;
         }
     }
 }

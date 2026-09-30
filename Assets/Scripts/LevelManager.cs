@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
-    private static int CurrentLevel = 1;
+    // Read straight from PlayerPrefs so ObstacleGenerator / LevelProgressTracker get the selected
+    // level even if they run Awake before this component does (script Awake order is undefined).
+    private static int CurrentLevel =>
+        Mathf.Clamp(PlayerPrefs.GetInt(GameKeys.SelectedLevel, 1), 1, LevelCount);
     
     // Level configuration: Store all level parameters
     [System.Serializable]
@@ -76,15 +79,8 @@ public class LevelManager : MonoBehaviour
 
     private void Awake()
     {
-        // Load the level that was selected in another scene
-        CurrentLevel = PlayerPrefs.GetInt(GameKeys.SelectedLevel, 1);
-        
-        // Clamp level to valid range
-        CurrentLevel = Mathf.Clamp(CurrentLevel, 1, LevelCount);
-        
-        // Save it back so it persists
+        // Normalise a bad saved value.
         PlayerPrefs.SetInt(GameKeys.SelectedLevel, CurrentLevel);
-        PlayerPrefs.Save();
     }
 
     /// <summary>
@@ -92,8 +88,7 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     public static void SetLevel(int level)
     {
-        CurrentLevel = Mathf.Clamp(level, 1, LevelCount);
-        PlayerPrefs.SetInt(GameKeys.SelectedLevel, CurrentLevel);
+        PlayerPrefs.SetInt(GameKeys.SelectedLevel, Mathf.Clamp(level, 1, LevelCount));
         PlayerPrefs.Save();
     }
 
