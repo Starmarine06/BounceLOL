@@ -18,7 +18,7 @@ public class ObstacleColor : MonoBehaviour
 
     void Update()
     {
-        if (sr != null)
+        if (sr != null && sr.color != BaseColor)
         {
             sr.color = BaseColor;
         }

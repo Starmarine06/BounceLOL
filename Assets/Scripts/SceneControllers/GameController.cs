@@ -212,6 +212,15 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene(GameKeys.MainMenuScene);
     }
 
+    void OnApplicationPause(bool paused)
+    {
+        // Returning from the home screen mid-fall would otherwise be an unfair instant death.
+        if (paused && !IsGameOver && !IsGamePaused && PauseMenuUI != null)
+        {
+            PauseMenuToggle();
+        }
+    }
+
     public void PauseMenuToggle()
     {
         if (!PauseMenuUI.activeSelf)

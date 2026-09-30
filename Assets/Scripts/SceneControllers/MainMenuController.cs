@@ -12,6 +12,8 @@ public class MainMenuController : MonoBehaviour
 
     void Awake()
     {
+        // A previous run may have ended with timeScale 0; menus must never start frozen.
+        Time.timeScale = 1;
         QuitPopupUI.SetActive(false);
         BestScoreText.text = "BEST SCORE\n" + PlayerPrefs.GetInt(MainController.Prefs_BestScore_Key, MainController.Prefs_BestScore_DefaultValue);
     }
@@ -44,7 +46,7 @@ public class MainMenuController : MonoBehaviour
         }
         else
         {
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene(GameKeys.PlayScene);
         }
     }
 
@@ -56,7 +58,9 @@ public class MainMenuController : MonoBehaviour
         }
         else
         {
-            QuitPopupUI.SetActive(false);
+            // A previous run may have ended with timeScale 0; menus must never start frozen.
+        Time.timeScale = 1;
+        QuitPopupUI.SetActive(false);
         }
     }
 

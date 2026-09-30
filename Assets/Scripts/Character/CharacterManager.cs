@@ -35,13 +35,10 @@ public class CharacterManager : MonoBehaviour
 
     void Update()
     {
-        if (PlayerPrefs.GetInt("Audio") == 1)
+        bool audioOn = PlayerPrefs.GetInt("Audio") == 1;
+        if (audioSource.enabled != audioOn)
         {
-            audioSource.enabled = true;
-        }
-        else
-        {
-            audioSource.enabled = false;
+            audioSource.enabled = audioOn;
         }
     }
 
