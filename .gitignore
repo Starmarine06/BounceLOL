@@ -74,3 +74,6 @@ user.keystore
 Packages.zip
 output.zip
 pepk.jar
+*.pem
+.utmp/
+*.backup*
